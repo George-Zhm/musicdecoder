@@ -1,0 +1,15 @@
+E:\programme\c#_workspace_asw\musicdecoder\obj\Debug\net6.0\musicdecoder.csproj.AssemblyReference.cache
+E:\programme\c#_workspace_asw\musicdecoder\obj\Debug\net6.0\musicdecoder.GeneratedMSBuildEditorConfig.editorconfig
+E:\programme\c#_workspace_asw\musicdecoder\obj\Debug\net6.0\musicdecoder.AssemblyInfoInputs.cache
+E:\programme\c#_workspace_asw\musicdecoder\obj\Debug\net6.0\musicdecoder.AssemblyInfo.cs
+E:\programme\c#_workspace_asw\musicdecoder\obj\Debug\net6.0\musicdecoder.csproj.CoreCompileInputs.cache
+E:\programme\c#_workspace_asw\musicdecoder\bin\Debug\net6.0\musicdecoder.exe
+E:\programme\c#_workspace_asw\musicdecoder\bin\Debug\net6.0\musicdecoder.deps.json
+E:\programme\c#_workspace_asw\musicdecoder\bin\Debug\net6.0\musicdecoder.runtimeconfig.json
+E:\programme\c#_workspace_asw\musicdecoder\bin\Debug\net6.0\musicdecoder.dll
+E:\programme\c#_workspace_asw\musicdecoder\bin\Debug\net6.0\musicdecoder.pdb
+E:\programme\c#_workspace_asw\musicdecoder\obj\Debug\net6.0\musicdecoder.dll
+E:\programme\c#_workspace_asw\musicdecoder\obj\Debug\net6.0\refint\musicdecoder.dll
+E:\programme\c#_workspace_asw\musicdecoder\obj\Debug\net6.0\musicdecoder.pdb
+E:\programme\c#_workspace_asw\musicdecoder\obj\Debug\net6.0\musicdecoder.genruntimeconfig.cache
+E:\programme\c#_workspace_asw\musicdecoder\obj\Debug\net6.0\ref\musicdecoder.dll
