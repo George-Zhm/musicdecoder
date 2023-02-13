@@ -59,7 +59,7 @@ namespace musicdecoder
 
             private void Mp3HeadDecoder(FileStream fs)
             {
-                streamoffset;
+                // streamoffset;s
                 int  n = (int)fs.Length;
                 if(n<10)
                 {
