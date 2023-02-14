@@ -40,7 +40,7 @@ namespace musicdecoder
 
         }
 
-        private class Mp3Head
+        class Mp3Head
         {
             bool existence = false;
             TAGHead head;
@@ -54,6 +54,15 @@ namespace musicdecoder
                 else
                 {
                     existence = false;
+                }
+
+                if(existence)
+                {
+
+                }
+                else
+                {
+                    Console.WriteLine("TAG:ID3 does not exist");
                 }
             }
 
@@ -70,19 +79,46 @@ namespace musicdecoder
                 {
                     byte[] music_bytestream = new byte[10];
                     int r = fs.Read(music_bytestream,0,10);
+                    Console.WriteLine(BitConverter.ToString(music_bytestream));
+                    string str = System.Text.Encoding.Default.GetString(music_bytestream);
+                    if(r<10)
+                    {
+                        existence = false;
+                        return;
+                    }
+                    if(str.StartsWith("ID3"))
+                    {
+                        existence = true;
+                        head = new TAGHead(music_bytestream);
+                    }
                 }
             }
 
-            private class TAGHead
+            class TAGHead
             {
-                string? header{set;get;}
-                char? ver{set;get;}
-                char? revision{set;get;}
-                char? flag{set;get;}
+                string header{set;get;} = string.Empty;
+                int ver{set;get;}
+                int revision{set;get;}
+                byte flag{set;get;}
                 int size{set;get;}
+
+                public TAGHead(byte[] bytes)
+                {
+                    header = "ID3";
+                    ver = (int)bytes[3];
+                    revision = (int)bytes[4];
+                    flag = bytes[5];
+                    size = (((int)bytes[6]&0x7F)<<21)+(((int)bytes[7]&0x7F)<<14)+(((int)bytes[8]&0x7F)<<7)+((int)bytes[9]&0x7F);
+                    Console.WriteLine("TAG:");
+                    Console.WriteLine("header:"+header);
+                    Console.WriteLine("ver:"+ver);
+                    Console.WriteLine("revision:"+revision);
+                    Console.WriteLine("flag:"+flag);
+                    Console.WriteLine("size:"+size);
+                }
             }
 
-            private class TAGFrame
+            class TAGFrame
             {
 
             }
