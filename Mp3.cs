@@ -5,74 +5,98 @@ using System.Threading.Tasks;
 
 namespace musicdecoder
 {
+    enum FrameType
+    {
+        ID3V1TAG,
+        ID3V2TAG,
+        APEV2TAG,
+        FRAME,
+        INVALID
+    }
 
     public class Mp3
     {
         private FileStream mp3FileStream;
 
-        private Mp3Head? mp3Head;
+        private List<Mp3Tag> mp3Tags;
         private List<Mp3Frame> mp3Frames;
-        private Mp3Tail? mp3Tail;
 
-        protected static int streamoffset = 0;
+
 
         public Mp3(string filepath)
         {
             mp3FileStream = new FileStream(filepath, FileMode.Open, FileAccess.Read);
             Mp3Decoder();
+            mp3FileStream.Close();
         }
 
         public void Mp3Decoder()
         {
-            mp3Head = new Mp3Head(mp3FileStream);
- 
-        }
-
-
-
-        private void Mp3FrameDecoder()
-        {
-
-        }
-
-        private void Mp3TailDecoder()
-        {
-
-        }
-
-        class Mp3Head
-        {
-            bool existence = false;
-            TAGHead head;
-
-            public Mp3Head(FileStream fileStream)
+            int streamoffset = 0;
+            while(streamoffset < mp3FileStream.Length)
             {
-                if(fileStream!=null)
+                FrameType frameType = Tagseeker();
+                switch (frameType)
                 {
-                    Mp3HeadDecoder(fileStream);
-                }
-                else
-                {
-                    existence = false;
-                }
+                    
+                    case FrameType.ID3V1TAG:
+                    case FrameType.ID3V2TAG:
+                    case FrameType.APEV2TAG:
+                        var mp3Tag = Mp3TagDecoder(frameType);
+                        if(mp3Tag != null)
+                        {
+                            mp3Tags.Add(mp3Tag);
+                        }
+                        break;
+                    case FrameType.FRAME:
+                        var mp3Frame = Mp3FrameDecoder();
+                        if(mp3Frame != null)
+                        {   
+                            mp3Frames.Add(mp3Frame);
+                        }
+                        break;
+                    default:
+                        break;
 
-                if(existence)
-                {
+                }
+            }
+        }
 
-                }
-                else
-                {
-                    Console.WriteLine("TAG:ID3 does not exist");
-                }
+        private FrameType Tagseeker()
+        {
+            return FrameType.INVALID;
+        } 
+
+        private Mp3Tag? Mp3TagDecoder(FrameType type)
+        {
+            return null;
+        }
+
+        private Mp3Frame? Mp3FrameDecoder()
+        {
+            return null;
+        }
+
+
+
+        class Mp3Tag
+        {
+            string tagtype = string.Empty;
+            ID3v2Tag? iD3v2Tag;
+            ID3v1Tag? iD3v1Tag;
+            APEV2Tag? apev2Tag;
+
+            public Mp3Tag()
+            {
+
             }
 
             private void Mp3HeadDecoder(FileStream fs)
             {
-                // streamoffset;s
+                // streamoffset;
                 int  n = (int)fs.Length;
                 if(n<10)
                 {
-                    existence = false;
                     return;
                 }
                 else
@@ -83,18 +107,16 @@ namespace musicdecoder
                     string str = System.Text.Encoding.Default.GetString(music_bytestream);
                     if(r<10)
                     {
-                        existence = false;
                         return;
                     }
                     if(str.StartsWith("ID3"))
                     {
-                        existence = true;
                         head = new TAGHead(music_bytestream);
                     }
                 }
             }
 
-            class TAGHead
+            class ID3v2Tag
             {
                 string header{set;get;} = string.Empty;
                 int ver{set;get;}
@@ -102,7 +124,7 @@ namespace musicdecoder
                 byte flag{set;get;}
                 int size{set;get;}
 
-                public TAGHead(byte[] bytes)
+                public ID3v2Tag(byte[] bytes)
                 {
                     header = "ID3";
                     ver = (int)bytes[3];
@@ -118,10 +140,16 @@ namespace musicdecoder
                 }
             }
 
-            class TAGFrame
+            class ID3v1Tag
             {
 
             }
+
+            class APEV2Tag
+            {
+
+            }
+
         }
 
         private class Mp3Frame
@@ -129,10 +157,6 @@ namespace musicdecoder
 
         }
 
-        private class Mp3Tail
-        {
-
-        }
 
     }
 }
