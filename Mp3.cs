@@ -17,7 +17,7 @@ namespace musicdecoder
     public class Mp3
     {
         private FileStream mp3FileStream;
-
+        private byte[] rawbytes;
         private List<ID3v1Tag> id3v1Tags;
         private List<ID3v2Tag> id3v2Tags;
         private List<Mp3Frame> mp3Frames;
@@ -27,6 +27,9 @@ namespace musicdecoder
         public Mp3(string filepath)
         {
             mp3FileStream = new FileStream(filepath, FileMode.Open, FileAccess.Read);
+            //reveive complete file
+            mp3FileStream.Read(rawbytes,0,mp3FileStream.Length);
+            //
             Mp3Decoder();
             mp3FileStream.Close();
         }
@@ -40,11 +43,12 @@ namespace musicdecoder
             while(streamoffset + 11 < mp3FileStream.Length)
             {
                 int r = mp3FileStream.Read(filterbytes,streamoffset,10);
-                if(BitConverter.ToString(filterbytes).StartsWith("ID3"))
+                string str = System.Text.Encoding.Default.GetString(filterbytes);
+                if(str.StartsWith("ID3"))
                 {
                     frameType = FrameType.ID3V2TAG;
                 }
-                else if(BitConverter.ToString(filterbytes).StartsWith("TAG"))
+                else if(str.StartsWith("TAG"))
                 {
                     frameType = FrameType.ID3V1TAG;
                 }
@@ -95,11 +99,6 @@ namespace musicdecoder
 
         private ID3v2Tag? ID3v2Decoder(FileStream fs, int offset)
         {
-            byte[] headbytes = new byte[10];
-            fs.Read(headbytes,offset,10);
-            int length = (((int)headbytes[6]&0x7F)<<21)+(((int)headbytes[7]&0x7F)<<14)+(((int)headbytes[8]&0x7F)<<7)+((int)headbytes[9]&0x7F);
-            byte[] contentbytes = new byte[length];
-            fs.Read(contentbytes,offset+10,length);
             ID3v2Tag newID3v2Tag = new ID3v2Tag(headbytes,contentbytes);
             return null;
         }
@@ -119,12 +118,13 @@ namespace musicdecoder
             public ID3v2Tag(byte[] headbytes,byte[] contentbytes)
             {
                 head = headbytes;
-
+                content = contentbytes;
                 header = "ID3";
                 ver = (int)headbytes[3];
                 revision = (int)headbytes[4];
                 flag = headbytes[5];
                 size = (((int)headbytes[6]&0x7F)<<21)+(((int)headbytes[7]&0x7F)<<14)+(((int)headbytes[8]&0x7F)<<7)+((int)headbytes[9]&0x7F);
+                tagLength = size+10;
                 Console.WriteLine("TAG:");
                 Console.WriteLine("header:"+header);
                 Console.WriteLine("ver:"+ver);
