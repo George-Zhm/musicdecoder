@@ -31,7 +31,7 @@ namespace musicdecoder
             mp3FileStream = new Myfilestream(filepath, FileMode.Open, FileAccess.Read);
             //reveive complete file
             rawbytes = new byte[mp3FileStream.Length];
-            mp3FileStream.ReadAll(rawbytes,0,mp3FileStream.Length);
+            rawlength = mp3FileStream.ReadAll(rawbytes,0,mp3FileStream.Length);
             //
             Mp3Decoder();
             mp3FileStream.Close();
@@ -39,13 +39,10 @@ namespace musicdecoder
 
         public void Mp3Decoder()
         {
-            int streamoffset = 0;
-            byte[] filterbytes = new byte[10];
-   
+            int streamoffset = 0; 
             FrameType frameType = FrameType.INVALID;
             while(streamoffset + 11 < mp3FileStream.Length)
             {
-                string str = System.Text.Encoding.Default.GetString(filterbytes);
                 if(str.StartsWith("ID3"))
                 {
                     frameType = FrameType.ID3V2TAG;
@@ -99,9 +96,17 @@ namespace musicdecoder
             return null;
         }
 
-        private ID3v2Tag? ID3v2Decoder(FileStream fs, int offset)
-        {
-            // ID3v2Tag newID3v2Tag = new ID3v2Tag(headbytes,contentbytes);
+        private ID3v2Tag? ID3v2Decoder(byte[] streambytes, long index)
+        {   
+            long headindex = index;
+            string header = string.Empty;
+            int ver
+            int revision
+            bitarry flag
+            int size
+
+            long contentindex = index+10;
+            ID3v2Tag newID3v2Tag = new ID3v2Tag(headbytes,contentbytes);
             return null;
         }
 
@@ -110,7 +115,7 @@ namespace musicdecoder
             return null;
         }
 
-        class ID3v2Tag:TAG
+        class ID3v2Tag
         {
             string header{set;get;} = string.Empty;
             int ver{set;get;}
@@ -150,13 +155,6 @@ namespace musicdecoder
         }
 
 
-    }
-
-    class TAG
-    {
-        public int tagLength;
-        public byte[]? head;
-        public byte[]? content;
     }
 
     class Myfilestream : FileStream
