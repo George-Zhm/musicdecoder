@@ -1,38 +1,8 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Codespaces
-Marketplace
-Explore
- 
-@George-Zhm 
-George-Zhm
-/
-musicdecoder
-Public
-Cannot fork because you own this repository and are not a member of any organizations.
-Code
-Issues
-Pull requests
-Actions
-Projects
-Wiki
-Security
-Insights
-Settings
-musicdecoder/Mp3.cs /
-@George-Zhm
-George-Zhm fix filestream useage
-Latest commit c8d1847 12 hours ago
- History
- 1 contributor
-159 lines (138 sloc)  4.26 KB
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Win32.SafeHandles;
 
 namespace musicdecoder
 {
@@ -47,8 +17,9 @@ namespace musicdecoder
 
     public class Mp3
     {
-        private FileStream mp3FileStream;
+        private Myfilestream mp3FileStream;
         private byte[] rawbytes;
+        long rawlength;
         private List<ID3v1Tag> id3v1Tags;
         private List<ID3v2Tag> id3v2Tags;
         private List<Mp3Frame> mp3Frames;
@@ -57,9 +28,10 @@ namespace musicdecoder
 
         public Mp3(string filepath)
         {
-            mp3FileStream = new FileStream(filepath, FileMode.Open, FileAccess.Read);
+            mp3FileStream = new Myfilestream(filepath, FileMode.Open, FileAccess.Read);
             //reveive complete file
-            mp3FileStream.Read(rawbytes,0,mp3FileStream.Length);
+            rawbytes = new byte[mp3FileStream.Length];
+            mp3FileStream.ReadAll(rawbytes,0,mp3FileStream.Length);
             //
             Mp3Decoder();
             mp3FileStream.Close();
@@ -73,7 +45,6 @@ namespace musicdecoder
             FrameType frameType = FrameType.INVALID;
             while(streamoffset + 11 < mp3FileStream.Length)
             {
-                int r = mp3FileStream.Read(filterbytes,streamoffset,10);
                 string str = System.Text.Encoding.Default.GetString(filterbytes);
                 if(str.StartsWith("ID3"))
                 {
@@ -130,7 +101,7 @@ namespace musicdecoder
 
         private ID3v2Tag? ID3v2Decoder(FileStream fs, int offset)
         {
-            ID3v2Tag newID3v2Tag = new ID3v2Tag(headbytes,contentbytes);
+            // ID3v2Tag newID3v2Tag = new ID3v2Tag(headbytes,contentbytes);
             return null;
         }
 
@@ -186,5 +157,35 @@ namespace musicdecoder
         public int tagLength;
         public byte[]? head;
         public byte[]? content;
+    }
+
+    class Myfilestream : FileStream
+    {
+
+        public Myfilestream(string path, FileMode mode, FileAccess access) : base(path, mode, access)
+        {
+        }
+
+        public long ReadAll(byte[] buffer, int offset, long count)
+        {   
+            long bufferSize = 0;
+            int tempsize = 0;
+            byte[] tempbuffer = new byte[1024];
+            while((tempsize = Read(tempbuffer,0,1024))>0)
+            {
+                if(tempsize<1024)
+                {
+                    byte[] endbuffer = new byte[tempsize];
+                    Array.Copy(tempbuffer,endbuffer,tempsize);
+                    endbuffer.CopyTo(buffer,bufferSize);
+                }
+                else
+                {
+                    tempbuffer.CopyTo(buffer,bufferSize);
+                }
+                bufferSize+=tempsize;
+            }
+            return bufferSize;
+        }
     }
 }
