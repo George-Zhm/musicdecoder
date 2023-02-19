@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -43,11 +44,11 @@ namespace musicdecoder
             FrameType frameType = FrameType.INVALID;
             while(streamoffset + 11 < mp3FileStream.Length)
             {
-                if(str.StartsWith("ID3"))
+                if((rawbytes[streamoffset]==0x49)&&(rawbytes[streamoffset+1]==0x44)&&(rawbytes[streamoffset+2]==0x33))
                 {
                     frameType = FrameType.ID3V2TAG;
                 }
-                else if(str.StartsWith("TAG"))
+                else if(false)
                 {
                     frameType = FrameType.ID3V1TAG;
                 }
@@ -62,7 +63,7 @@ namespace musicdecoder
                         break;
                     case FrameType.ID3V2TAG:
                     {
-                        var id3v2Tag = ID3v2Decoder(mp3FileStream,streamoffset);
+                        var id3v2Tag = ID3v2Decoder(rawbytes,streamoffset);
                         if(id3v2Tag != null)
                         {
                             id3v2Tags.Add(id3v2Tag);
@@ -99,14 +100,19 @@ namespace musicdecoder
         private ID3v2Tag? ID3v2Decoder(byte[] streambytes, long index)
         {   
             long headindex = index;
-            string header = string.Empty;
-            int ver
-            int revision
-            bitarry flag
-            int size
+            int ver;
+            int revision;
+            BitArray flag;;
+            int size;
+
+            ver = (int)streambytes[index+3];
+            revision = (int)streambytes[index+4];
+            flag = new BitArray(streambytes[index+5]);
+            size = (((int)streambytes[index+6]&0x7F)<<21)+(((int)streambytes[index+7]&0x7F)<<14)+(((int)streambytes[index+8]&0x7F)<<7)+((int)streambytes[index+9]&0x7F);
+
 
             long contentindex = index+10;
-            ID3v2Tag newID3v2Tag = new ID3v2Tag(headbytes,contentbytes);
+            ID3v2Tag newID3v2Tag = new ID3v2Tag();
             return null;
         }
 
@@ -117,20 +123,15 @@ namespace musicdecoder
 
         class ID3v2Tag
         {
+            int tagLength;
             string header{set;get;} = string.Empty;
             int ver{set;get;}
             int revision{set;get;}
             byte flag{set;get;}
             int size{set;get;}
-            public ID3v2Tag(byte[] headbytes,byte[] contentbytes)
+            public ID3v2Tag()
             {
-                head = headbytes;
-                content = contentbytes;
                 header = "ID3";
-                ver = (int)headbytes[3];
-                revision = (int)headbytes[4];
-                flag = headbytes[5];
-                size = (((int)headbytes[6]&0x7F)<<21)+(((int)headbytes[7]&0x7F)<<14)+(((int)headbytes[8]&0x7F)<<7)+((int)headbytes[9]&0x7F);
                 tagLength = size+10;
                 Console.WriteLine("TAG:");
                 Console.WriteLine("header:"+header);
