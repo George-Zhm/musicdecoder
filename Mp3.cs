@@ -100,6 +100,10 @@ namespace musicdecoder
         private ID3v2Tag? ID3v2Decoder(byte[] streambytes, long index)
         {   
             long headindex = index;
+            Byte[] headArray = new byte[10];
+
+            Array.ConstrainedCopy(streambytes,headindex,headArray,0,10);
+
             int ver;
             int revision;
             BitArray flag;;
@@ -108,11 +112,12 @@ namespace musicdecoder
             ver = (int)streambytes[index+3];
             revision = (int)streambytes[index+4];
             flag = new BitArray(streambytes[index+5]);
-            size = (((int)streambytes[index+6]&0x7F)<<21)+(((int)streambytes[index+7]&0x7F)<<14)+(((int)streambytes[index+8]&0x7F)<<7)+((int)streambytes[index+9]&0x7F);
-
+            size = (((int)streambytes[index+6]&0x7F)<<21)+(((int)streambytes[index+7]&0x7F)<<14)+
+            (((int)streambytes[index+8]&0x7F)<<7)+((int)streambytes[index+9]&0x7F);
+            ID3v2Tag newID3v2Tag = new ID3v2Tag(ver,revision,flag,size);
 
             long contentindex = index+10;
-            ID3v2Tag newID3v2Tag = new ID3v2Tag();
+
             return null;
         }
 
@@ -123,15 +128,21 @@ namespace musicdecoder
 
         class ID3v2Tag
         {
-            int tagLength;
+            public int tagLength{set;get;}
             string header{set;get;} = string.Empty;
             int ver{set;get;}
             int revision{set;get;}
-            byte flag{set;get;}
+            BitArray flag{set;get;}
             int size{set;get;}
-            public ID3v2Tag()
+
+
+            public ID3v2Tag(int v,int r,BitArray f,int s)
             {
                 header = "ID3";
+                ver = v;
+                revision = r;
+                flag = f;
+                size = s;
                 tagLength = size+10;
                 Console.WriteLine("TAG:");
                 Console.WriteLine("header:"+header);
